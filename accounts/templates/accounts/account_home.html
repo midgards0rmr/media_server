@@ -1,0 +1,36 @@
+{% extends "media_library/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Account" %}{% endblock %}
+
+{% block content %}
+    <section class="panel section" style="max-width: 620px;">
+        <div class="section-header">
+            <h2>{% translate "Account" %}</h2>
+        </div>
+        {% if request.user.is_authenticated %}
+            <div class="data-list">
+                <div class="data-row">
+                    <div class="data-label">Username</div>
+                    <div>{{ request.user.username }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="data-label">{% translate "Status" %}</div>
+                    <div>{% if request.user.is_staff %}{% translate "Administrator" %}{% else %}{% translate "User" %}{% endif %}</div>
+                </div>
+            </div>
+            <div class="actions" style="margin-top: 16px;">
+                <form class="inline-form" action="{% url 'accounts:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="button secondary">{% translate "Log out" %}</button>
+                </form>
+            </div>
+        {% else %}
+            <p class="meta">{% translate "You are not logged in." %}</p>
+            <div class="actions">
+                <a class="button" href="{% url 'accounts:login' %}">{% translate "Log in" %}</a>
+                <a class="button secondary" href="{% url 'accounts:register' %}">{% translate "Register" %}</a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,0 +1,302 @@
+{% extends "media_library/base.html" %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% translate "Edit" %}{% else %}{% translate "Add" %}{% endif %}{% endblock %}
+
+{% block content %}
+    <style>
+        .form-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 16px;
+        }
+
+        .import-search {
+            display: grid;
+            gap: 12px;
+        }
+
+        .import-results {
+            display: grid;
+            gap: 10px;
+            max-height: 640px;
+            overflow-y: auto;
+        }
+
+        .import-card {
+            display: grid;
+            grid-template-columns: 84px minmax(0, 1fr);
+            gap: 12px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #0f141a;
+        }
+
+        .import-card img,
+        .import-card .fallback {
+            width: 84px;
+            height: 126px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--panel-soft);
+        }
+
+        .import-card .fallback {
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .import-card h3 {
+            margin: 0 0 4px;
+            font-size: 1rem;
+        }
+
+        .import-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .field-help {
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .message {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="form-layout">
+        <aside class="stack">
+            <section class="panel section">
+                <div class="section-header">
+                    <h2>{% translate "Metadata import" %}</h2>
+                </div>
+                {% if tmdb_enabled %}
+                    <div class="import-search">
+                        <p class="meta">{% translate "Enter a title, choose a match with a poster, and we will fill in the main fields automatically." %}</p>
+                        <div class="field">
+                            <label for="id_tmdb_query">{% translate "Title search" %}</label>
+                            <input id="id_tmdb_query" type="search" placeholder="{% translate 'For example: Interstellar or Attack on Titan' %}">
+                        </div>
+                        <div class="actions">
+                            <button type="button" id="tmdb-search-button">{% translate "Find matches" %}</button>
+                        </div>
+                        <div id="tmdb-status" class="message"></div>
+                        <div id="tmdb-results" class="import-results"></div>
+                    </div>
+                {% else %}
+                    <p class="meta">{% translate "TMDB import is disabled. Set TMDB_API_KEY or TMDB_READ_ACCESS_TOKEN in the environment to enable search and autofill." %}</p>
+                {% endif %}
+            </section>
+        </aside>
+
+        <section class="panel section">
+            <div class="section-header">
+                <h2>{% if object %}{% blocktranslate with title=object.title %}Editing {{ title }}{% endblocktranslate %}{% else %}{% translate "New media" %}{% endif %}</h2>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="media-file-form">
+                {% csrf_token %}
+                <input type="hidden" name="tmdb_poster_url" id="id_tmdb_poster_url">
+                <input type="hidden" name="tmdb_backdrop_url" id="id_tmdb_backdrop_url">
+
+                <div class="stack">
+                    <section>
+                        <div class="section-header">
+                            <h3>{% translate "Main information" %}</h3>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field full">{{ form.title.label_tag }}{{ form.title }}</div>
+                            <div class="field full">{{ form.original_title.label_tag }}{{ form.original_title }}</div>
+                            <div class="field full">{{ form.description.label_tag }}{{ form.description }}</div>
+                            <div class="field">{{ form.media_type.label_tag }}{{ form.media_type }}</div>
+                            <div class="field">{{ form.status.label_tag }}{{ form.status }}</div>
+                            <div class="field">{{ form.release_year.label_tag }}{{ form.release_year }}</div>
+                            <div class="field">{{ form.language.label_tag }}{{ form.language }}</div>
+                            <div class="field">{{ form.age_rating.label_tag }}{{ form.age_rating }}</div>
+                            <div class="field full">{{ form.genres.label_tag }}{{ form.genres }}</div>
+                            <div class="field full">{{ form.countries.label_tag }}{{ form.countries }}</div>
+                        </div>
+                    </section>
+
+                    <details>
+                        <summary class="meta">{% translate "Advanced fields" %}</summary>
+                        <div class="form-grid" style="margin-top: 12px;">
+                            <div class="field full">{{ form.title_localizations.label_tag }}{{ form.title_localizations }}</div>
+                            <div class="field full">{{ form.description_localizations.label_tag }}{{ form.description_localizations }}</div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="actions" style="margin-top: 16px;">
+                    <button type="submit">{% translate "Save" %}</button>
+                    {% if object %}
+                        <a class="button secondary" href="{% url 'media_library:mediafile_detail' object.slug %}">{% translate "Cancel" %}</a>
+                    {% else %}
+                        <a class="button secondary" href="{% url 'media_library:mediafile_list' %}">{% translate "Cancel" %}</a>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+    </div>
+
+    {% if tmdb_enabled %}
+        <script>
+            const searchButton = document.getElementById("tmdb-search-button");
+            const searchInput = document.getElementById("id_tmdb_query");
+            const statusBox = document.getElementById("tmdb-status");
+            const resultsBox = document.getElementById("tmdb-results");
+
+            const fieldMap = {
+                title: document.getElementById("id_title"),
+                original_title: document.getElementById("id_original_title"),
+                description: document.getElementById("id_description"),
+                media_type: document.getElementById("id_media_type"),
+                status: document.getElementById("id_status"),
+                release_year: document.getElementById("id_release_year"),
+                genres: document.getElementById("id_genres"),
+                countries: document.getElementById("id_countries"),
+                language: document.getElementById("id_language"),
+                title_localizations: document.getElementById("id_title_localizations"),
+                description_localizations: document.getElementById("id_description_localizations"),
+                tmdb_poster_url: document.getElementById("id_tmdb_poster_url"),
+                tmdb_backdrop_url: document.getElementById("id_tmdb_backdrop_url"),
+            };
+
+            function setStatus(text) {
+                statusBox.textContent = text;
+            }
+
+            function renderResults(results) {
+                resultsBox.innerHTML = "";
+                if (!results.length) {
+                    setStatus("{% translate 'Nothing found.' %}");
+                    return;
+                }
+
+                setStatus("{% translate 'Choose one of the matches below.' %}");
+
+                for (const item of results) {
+                    const card = document.createElement("article");
+                    card.className = "import-card";
+                    const poster = item.poster_url
+                        ? `<img src="${item.poster_url}" alt="">`
+                        : `<div class="fallback">{% translate "No poster" %}</div>`;
+
+                    card.innerHTML = `
+                        ${poster}
+                        <div>
+                            <h3>${item.title || item.original_title}</h3>
+                            <p>${item.media_kind === "movie" ? "{% translate 'Movie' %}" : "{% translate 'Series' %}"}${item.release_date ? " • " + item.release_date.slice(0, 4) : ""}</p>
+                            <p>${item.overview || ""}</p>
+                            <div class="actions" style="margin-top: 10px;">
+                                <button type="button">{% translate "Use this" %}</button>
+                            </div>
+                        </div>
+                    `;
+
+                    card.querySelector("button").addEventListener("click", () => prefillResult(item));
+                    resultsBox.appendChild(card);
+                }
+            }
+
+            async function searchTMDB() {
+                const query = searchInput.value.trim();
+                if (!query) {
+                    setStatus("{% translate 'Enter a title first.' %}");
+                    return;
+                }
+
+                setStatus("{% translate 'Searching...' %}");
+                resultsBox.innerHTML = "";
+
+                const response = await fetch(`{% url 'media_library:tmdb_search' %}?query=${encodeURIComponent(query)}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setStatus(payload.error || "{% translate 'Search failed.' %}");
+                    return;
+                }
+
+                renderResults(payload.results || []);
+            }
+
+            async function prefillResult(item) {
+                setStatus("{% translate 'Loading details...' %}");
+                const params = new URLSearchParams({id: item.id, media_kind: item.media_kind});
+                const response = await fetch(`{% url 'media_library:tmdb_prefill' %}?${params.toString()}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setStatus(payload.error || "{% translate 'Unable to load details.' %}");
+                    return;
+                }
+
+                const data = payload.result || {};
+                fieldMap.title.value = data.title || "";
+                fieldMap.original_title.value = data.original_title || "";
+                fieldMap.description.value = data.description || "";
+                fieldMap.media_type.value = data.media_type || fieldMap.media_type.value;
+                fieldMap.status.value = data.status || fieldMap.status.value;
+                fieldMap.release_year.value = data.release_year || "";
+                fieldMap.genres.value = JSON.stringify(data.genres || [], null, 2);
+                fieldMap.countries.value = JSON.stringify(data.countries || [], null, 2);
+                fieldMap.language.value = data.language || "";
+                fieldMap.title_localizations.value = JSON.stringify(data.title_localizations || {}, null, 2);
+                fieldMap.description_localizations.value = JSON.stringify(data.description_localizations || {}, null, 2);
+                fieldMap.tmdb_poster_url.value = data.poster_url || "";
+                fieldMap.tmdb_backdrop_url.value = data.backdrop_url || "";
+                setStatus("{% translate 'Fields are filled. Check them and save the record.' %}");
+            }
+
+            searchButton.addEventListener("click", searchTMDB);
+            searchInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    searchTMDB();
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}

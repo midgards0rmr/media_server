@@ -1,0 +1,5 @@
+.venv
+.vscode
+.env
+media/
+tmp_uploads/

@@ -1,0 +1,487 @@
+{% extends "media_library/base.html" %}
+{% load i18n media_localization %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+    <style>
+        .form-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .stack,
+        .import-search,
+        .season-results,
+        .episode-results {
+            display: grid;
+            gap: 12px;
+        }
+
+        .import-results {
+            display: grid;
+            gap: 10px;
+            max-height: 640px;
+            overflow-y: auto;
+        }
+
+        .import-card {
+            display: grid;
+            grid-template-columns: 72px minmax(0, 1fr);
+            gap: 12px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #0f141a;
+        }
+
+        .import-card img,
+        .import-card .fallback {
+            width: 72px;
+            height: 108px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--panel-soft);
+        }
+
+        .import-card .fallback {
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .import-card h3 {
+            margin: 0 0 4px;
+            font-size: 1rem;
+        }
+
+        .import-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .season-button,
+        .episode-button {
+            justify-content: flex-start;
+            width: 100%;
+            min-height: auto;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        @media (max-width: 900px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="{% if season_import or episode_import %}form-layout{% else %}stack{% endif %}">
+        {% if season_import %}
+            <aside class="stack">
+                <section class="panel section">
+                    <div class="section-header">
+                        <h2>{% translate "Season import" %}</h2>
+                    </div>
+                    {% if tmdb_enabled %}
+                        <div class="import-search">
+                            <p class="meta">{% translate "Search TMDB by the parent title, choose the correct series, then choose a season." %}</p>
+                            <div class="field">
+                                <label for="id_tmdb_season_query">{% translate "Parent title" %}</label>
+                                <input id="id_tmdb_season_query" type="search" value="{{ season_import_query }}" placeholder="{% translate 'Series title' %}">
+                            </div>
+                            <div class="actions">
+                                <button type="button" id="tmdb-season-search-button">{% translate "Find series" %}</button>
+                            </div>
+                            <div id="tmdb-season-status" class="message"></div>
+                            <div id="tmdb-season-results" class="import-results"></div>
+                        </div>
+                    {% else %}
+                        <p class="meta">{% translate "TMDB import is disabled. Set TMDB_API_KEY or TMDB_READ_ACCESS_TOKEN in the environment to enable search and autofill." %}</p>
+                    {% endif %}
+                </section>
+            </aside>
+        {% elif episode_import %}
+            <aside class="stack">
+                <section class="panel section">
+                    <div class="section-header">
+                        <h2>{% translate "Episode import" %}</h2>
+                    </div>
+                    {% if tmdb_enabled %}
+                        <div class="import-search">
+                            <p class="meta">{% translate "Search TMDB by the parent title, choose the correct series, then choose an episode from the current season." %}</p>
+                            <div class="field">
+                                <label for="id_tmdb_episode_query">{% translate "Parent title" %}</label>
+                                <input id="id_tmdb_episode_query" type="search" value="{{ episode_import_query }}" placeholder="{% translate 'Series title' %}">
+                            </div>
+                            <div class="actions">
+                                <button type="button" id="tmdb-episode-search-button">{% translate "Find series" %}</button>
+                            </div>
+                            <div id="tmdb-episode-status" class="message"></div>
+                            <div id="tmdb-episode-results" class="import-results"></div>
+                        </div>
+                    {% else %}
+                        <p class="meta">{% translate "TMDB import is disabled. Set TMDB_API_KEY or TMDB_READ_ACCESS_TOKEN in the environment to enable search and autofill." %}</p>
+                    {% endif %}
+                </section>
+            </aside>
+        {% endif %}
+
+        <section class="panel section" {% if not season_import and not episode_import %}style="max-width: 720px;"{% endif %}>
+            <div class="section-header">
+                <div>
+                    <h2>{{ page_title }}</h2>
+                    {% if parent %}
+                        <div class="meta">{{ parent|localized_title }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="{% if season_import or episode_import %}stack{% else %}upload-drop{% endif %}">
+                    {{ form.as_p }}
+                    {% if not season_import and not episode_import %}
+                        <p class="meta">{% translate "After upload, processing will be queued. Run the media worker to analyze tracks and generate HLS." %}</p>
+                    {% endif %}
+                </div>
+                <div class="actions" style="margin-top: 16px;">
+                    <button type="submit">{% translate "Save" %}</button>
+                    <a class="button secondary" href="{{ cancel_url }}">{% translate "Cancel" %}</a>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    {% if season_import and tmdb_enabled %}
+        <script>
+            const seasonSearchButton = document.getElementById("tmdb-season-search-button");
+            const seasonSearchInput = document.getElementById("id_tmdb_season_query");
+            const seasonStatusBox = document.getElementById("tmdb-season-status");
+            const seasonResultsBox = document.getElementById("tmdb-season-results");
+
+            const seasonFields = {
+                season_number: document.getElementById("id_season_number"),
+                name: document.getElementById("id_name"),
+                description: document.getElementById("id_description"),
+                release_year: document.getElementById("id_release_year"),
+            };
+
+            function setSeasonStatus(text) {
+                seasonStatusBox.textContent = text;
+            }
+
+            function escapeHtml(value) {
+                return String(value || "")
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+            function renderSeriesResults(results) {
+                seasonResultsBox.innerHTML = "";
+                if (!results.length) {
+                    setSeasonStatus("{% translate 'Nothing found.' %}");
+                    return;
+                }
+
+                setSeasonStatus("{% translate 'Choose the parent series.' %}");
+
+                for (const item of results) {
+                    const card = document.createElement("article");
+                    card.className = "import-card";
+                    const poster = item.poster_url
+                        ? `<img src="${escapeHtml(item.poster_url)}" alt="">`
+                        : `<div class="fallback">{% translate "No poster" %}</div>`;
+
+                    card.innerHTML = `
+                        ${poster}
+                        <div>
+                            <h3>${escapeHtml(item.title || item.original_title)}</h3>
+                            <p>{% translate "Series" %}${item.release_date ? " • " + escapeHtml(item.release_date.slice(0, 4)) : ""}</p>
+                            <p>${escapeHtml(item.overview || "")}</p>
+                            <div class="actions" style="margin-top: 10px;">
+                                <button type="button">{% translate "Choose series" %}</button>
+                            </div>
+                            <div class="season-results" hidden></div>
+                        </div>
+                    `;
+
+                    card.querySelector("button").addEventListener("click", () => loadSeasons(item, card));
+                    seasonResultsBox.appendChild(card);
+                }
+            }
+
+            function renderSeasons(series, card, seasons) {
+                const box = card.querySelector(".season-results");
+                box.innerHTML = "";
+                box.hidden = false;
+
+                if (!seasons.length) {
+                    box.innerHTML = `<p class="meta">{% translate "No seasons found." %}</p>`;
+                    return;
+                }
+
+                for (const season of seasons) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "button secondary season-button";
+                    const year = season.air_date ? ` • ${escapeHtml(season.air_date.slice(0, 4))}` : "";
+                    const episodes = season.episode_count ? ` • ${season.episode_count} {% translate "episodes" %}` : "";
+                    button.innerHTML = `
+                        <span>
+                            <strong>${escapeHtml(season.name || "{% translate 'Season' %} " + season.season_number)}</strong>
+                            <span class="meta">${year}${episodes}</span>
+                        </span>
+                    `;
+                    button.addEventListener("click", () => prefillSeason(series.id, season.season_number));
+                    box.appendChild(button);
+                }
+            }
+
+            async function searchSeasonsTMDB() {
+                const query = seasonSearchInput.value.trim();
+                if (!query) {
+                    setSeasonStatus("{% translate 'Enter a title first.' %}");
+                    return;
+                }
+
+                setSeasonStatus("{% translate 'Searching...' %}");
+                seasonResultsBox.innerHTML = "";
+
+                const response = await fetch(`{% url 'media_library:tmdb_season_search' %}?query=${encodeURIComponent(query)}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setSeasonStatus(payload.error || "{% translate 'Search failed.' %}");
+                    return;
+                }
+
+                renderSeriesResults(payload.results || []);
+            }
+
+            async function loadSeasons(series, card) {
+                setSeasonStatus("{% translate 'Loading seasons...' %}");
+                const params = new URLSearchParams({id: series.id});
+                const response = await fetch(`{% url 'media_library:tmdb_season_list' %}?${params.toString()}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setSeasonStatus(payload.error || "{% translate 'Unable to load details.' %}");
+                    return;
+                }
+
+                setSeasonStatus("{% translate 'Choose a season.' %}");
+                renderSeasons(series, card, payload.seasons || []);
+            }
+
+            async function prefillSeason(seriesId, seasonNumber) {
+                setSeasonStatus("{% translate 'Loading details...' %}");
+                const params = new URLSearchParams({id: seriesId, season_number: seasonNumber});
+                const response = await fetch(`{% url 'media_library:tmdb_season_prefill' %}?${params.toString()}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setSeasonStatus(payload.error || "{% translate 'Unable to load details.' %}");
+                    return;
+                }
+
+                const data = payload.result || {};
+                seasonFields.season_number.value = data.season_number || "";
+                seasonFields.name.value = data.name || "";
+                seasonFields.description.value = data.description || "";
+                seasonFields.release_year.value = data.release_year || "";
+                setSeasonStatus("{% translate 'Fields are filled. Check them and save the record.' %}");
+            }
+
+            seasonSearchButton.addEventListener("click", searchSeasonsTMDB);
+            seasonSearchInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    searchSeasonsTMDB();
+                }
+            });
+        </script>
+    {% endif %}
+
+    {% if episode_import and tmdb_enabled %}
+        <script>
+            const episodeSearchButton = document.getElementById("tmdb-episode-search-button");
+            const episodeSearchInput = document.getElementById("id_tmdb_episode_query");
+            const episodeStatusBox = document.getElementById("tmdb-episode-status");
+            const episodeResultsBox = document.getElementById("tmdb-episode-results");
+            const currentSeasonNumber = "{{ episode_import_season_number }}";
+
+            const episodeFields = {
+                episode_number: document.getElementById("id_episode_number"),
+                title: document.getElementById("id_title"),
+                description: document.getElementById("id_description"),
+                duration_minutes: document.getElementById("id_duration_minutes"),
+                release_date: document.getElementById("id_release_date"),
+            };
+
+            function setEpisodeStatus(text) {
+                episodeStatusBox.textContent = text;
+            }
+
+            function escapeEpisodeHtml(value) {
+                return String(value || "")
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+            function renderEpisodeSeriesResults(results) {
+                episodeResultsBox.innerHTML = "";
+                if (!results.length) {
+                    setEpisodeStatus("{% translate 'Nothing found.' %}");
+                    return;
+                }
+
+                setEpisodeStatus("{% translate 'Choose the parent series.' %}");
+
+                for (const item of results) {
+                    const card = document.createElement("article");
+                    card.className = "import-card";
+                    const poster = item.poster_url
+                        ? `<img src="${escapeEpisodeHtml(item.poster_url)}" alt="">`
+                        : `<div class="fallback">{% translate "No poster" %}</div>`;
+
+                    card.innerHTML = `
+                        ${poster}
+                        <div>
+                            <h3>${escapeEpisodeHtml(item.title || item.original_title)}</h3>
+                            <p>{% translate "Series" %}${item.release_date ? " • " + escapeEpisodeHtml(item.release_date.slice(0, 4)) : ""}</p>
+                            <p>${escapeEpisodeHtml(item.overview || "")}</p>
+                            <div class="actions" style="margin-top: 10px;">
+                                <button type="button">{% translate "Choose series" %}</button>
+                            </div>
+                            <div class="episode-results" hidden></div>
+                        </div>
+                    `;
+
+                    card.querySelector("button").addEventListener("click", () => loadEpisodes(item, card));
+                    episodeResultsBox.appendChild(card);
+                }
+            }
+
+            function renderEpisodes(series, card, episodes) {
+                const box = card.querySelector(".episode-results");
+                box.innerHTML = "";
+                box.hidden = false;
+
+                if (!episodes.length) {
+                    box.innerHTML = `<p class="meta">{% translate "No episodes found." %}</p>`;
+                    return;
+                }
+
+                for (const episode of episodes) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "button secondary episode-button";
+                    const date = episode.air_date ? ` • ${escapeEpisodeHtml(episode.air_date)}` : "";
+                    const runtime = episode.runtime ? ` • ${episode.runtime} {% translate "min" %}` : "";
+                    button.innerHTML = `
+                        <span>
+                            <strong>{% translate "Episode" %} ${episode.episode_number}: ${escapeEpisodeHtml(episode.title || "")}</strong>
+                            <span class="meta">${date}${runtime}</span>
+                        </span>
+                    `;
+                    button.addEventListener("click", () => prefillEpisode(series.id, episode.episode_number));
+                    box.appendChild(button);
+                }
+            }
+
+            async function searchEpisodesTMDB() {
+                const query = episodeSearchInput.value.trim();
+                if (!query) {
+                    setEpisodeStatus("{% translate 'Enter a title first.' %}");
+                    return;
+                }
+
+                setEpisodeStatus("{% translate 'Searching...' %}");
+                episodeResultsBox.innerHTML = "";
+
+                const response = await fetch(`{% url 'media_library:tmdb_season_search' %}?query=${encodeURIComponent(query)}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setEpisodeStatus(payload.error || "{% translate 'Search failed.' %}");
+                    return;
+                }
+
+                renderEpisodeSeriesResults(payload.results || []);
+            }
+
+            async function loadEpisodes(series, card) {
+                setEpisodeStatus("{% translate 'Loading episodes...' %}");
+                const params = new URLSearchParams({
+                    id: series.id,
+                    season_number: currentSeasonNumber,
+                });
+                const response = await fetch(`{% url 'media_library:tmdb_episode_list' %}?${params.toString()}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setEpisodeStatus(payload.error || "{% translate 'Unable to load details.' %}");
+                    return;
+                }
+
+                setEpisodeStatus("{% translate 'Choose an episode.' %}");
+                renderEpisodes(series, card, payload.episodes || []);
+            }
+
+            async function prefillEpisode(seriesId, episodeNumber) {
+                setEpisodeStatus("{% translate 'Loading details...' %}");
+                const params = new URLSearchParams({
+                    id: seriesId,
+                    season_number: currentSeasonNumber,
+                    episode_number: episodeNumber,
+                });
+                const response = await fetch(`{% url 'media_library:tmdb_episode_prefill' %}?${params.toString()}`, {
+                    headers: {"X-Requested-With": "XMLHttpRequest"},
+                });
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    setEpisodeStatus(payload.error || "{% translate 'Unable to load details.' %}");
+                    return;
+                }
+
+                const data = payload.result || {};
+                episodeFields.episode_number.value = data.episode_number || "";
+                episodeFields.title.value = data.title || "";
+                episodeFields.description.value = data.description || "";
+                episodeFields.duration_minutes.value = data.duration_minutes || "";
+                episodeFields.release_date.value = data.release_date || "";
+                setEpisodeStatus("{% translate 'Fields are filled. Check them and save the record.' %}");
+            }
+
+            episodeSearchButton.addEventListener("click", searchEpisodesTMDB);
+            episodeSearchInput.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    searchEpisodesTMDB();
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "media_library/base.html" %}
+{% load i18n media_localization %}
+
+{% block title %}{% translate "Media Server" %}{% endblock %}
+
+{% block content %}
+    <div class="list-layout">
+        <aside class="panel section">
+            <div class="section-header">
+                <h2>{% translate "Filters" %}</h2>
+            </div>
+            <form method="get">
+                <p>
+                    <label for="id_q">{% translate "Search" %}</label>
+                    <input id="id_q" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Title or description' %}">
+                </p>
+                <p>
+                    <label for="id_type">{% translate "Type" %}</label>
+                    <select id="id_type" name="type">
+                        <option value="">{% translate "All" %}</option>
+                        {% for value, label in media_types %}
+                            <option value="{{ value }}"{% if selected_type == value %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+                <p>
+                    <label for="id_year">{% translate "Year" %}</label>
+                    <select id="id_year" name="year">
+                        <option value="">{% translate "All" %}</option>
+                        {% for year in available_years %}
+                            <option value="{{ year }}"{% if selected_year == year|stringformat:"s" %} selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+                <p>
+                    <label>{% translate "Genres" %}</label>
+                    <div class="checkbox-list">
+                        {% for genre in available_genres %}
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="genres" value="{{ genre }}"{% if genre in selected_genres %} checked{% endif %}>
+                                <span>{{ genre }}</span>
+                            </label>
+                        {% empty %}
+                            <div class="meta">{% translate "Genres are not filled in yet." %}</div>
+                        {% endfor %}
+                    </div>
+                </p>
+                <div class="actions">
+                    <button type="submit">{% translate "Apply" %}</button>
+                    <a class="button secondary" href="{% url 'media_library:mediafile_list' %}">{% translate "Reset" %}</a>
+                </div>
+            </form>
+        </aside>
+
+        <section class="panel section">
+            <div class="section-header">
+                <h2>{% translate "Catalog" %}</h2>
+                <div class="meta">{{ media_count }} {% translate "items" %}</div>
+            </div>
+
+            <div class="catalog-grid">
+                {% for media_file in media_files %}
+                    <article class="panel media-card">
+                        <div class="media-thumb">
+                            {% with primary_image=media_file.get_primary_image %}
+                                {% if primary_image %}
+                                    {% with image_alt=media_file|localized_title %}
+                                        <img src="{{ primary_image.image.url }}" alt="{{ primary_image.alt_text|default:image_alt }}">
+                                    {% endwith %}
+                                {% else %}
+                                    <div class="media-fallback">{% translate "No poster" %}</div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="media-body">
+                            <h3 class="media-title">
+                                <a href="{% url 'media_library:mediafile_detail' media_file.slug %}">{{ media_file|localized_title }}</a>
+                            </h3>
+                            <p class="media-subtitle">
+                                {{ media_file.get_media_type_display }}
+                                {% if media_file.release_year %} • {{ media_file.release_year }}{% endif %}
+                            </p>
+
+                            <div class="tags">
+                                <span class="tag">{{ media_file.get_status_display }}</span>
+                                {% if media_file.seasons.count %}
+                                    <span class="tag">{% blocktranslate count count=media_file.seasons.count %}{{ count }} season{% plural %}{{ count }} seasons{% endblocktranslate %}</span>
+                                {% endif %}
+                                {% if media_file.variants.count %}
+                                    <span class="tag">{% blocktranslate count count=media_file.variants.count %}{{ count }} file{% plural %}{{ count }} files{% endblocktranslate %}</span>
+                                {% endif %}
+                                {% for genre in media_file.genres %}
+                                    <span class="tag">{{ genre }}</span>
+                                {% endfor %}
+                            </div>
+
+                            {% with description=media_file|localized_description %}
+                                {% if description %}
+                                    <p class="media-description">{{ description|truncatewords:14 }}</p>
+                                {% endif %}
+                            {% endwith %}
+
+                            <div class="actions">
+                                <a class="button secondary" href="{% url 'media_library:mediafile_detail' media_file.slug %}">{% translate "Open" %}</a>
+                                {% if request.user.is_staff %}
+                                    <a class="button secondary" href="{% url 'media_library:mediafile_update' media_file.slug %}">{% translate "Edit" %}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        {% translate "Catalog is empty." %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+{% endblock %}

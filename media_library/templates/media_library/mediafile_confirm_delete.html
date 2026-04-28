@@ -1,0 +1,17 @@
+{% extends "media_library/base.html" %}
+
+{% block title %}Удаление {{ media_file.title }}{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <h2>Удалить "{{ media_file }}"?</h2>
+        <p>Это действие доступно только администратору и удалит запись из каталога.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="actions">
+                <button type="submit">Подтвердить удаление</button>
+                <a class="button secondary" href="{% url 'media_library:mediafile_detail' media_file.slug %}">Отмена</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

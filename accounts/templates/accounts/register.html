@@ -1,0 +1,20 @@
+{% extends "media_library/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Register" %}{% endblock %}
+
+{% block content %}
+    <section class="panel section" style="max-width: 520px; margin: 0 auto;">
+        <div class="section-header">
+            <h2>{% translate "Register" %}</h2>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="actions">
+                <button type="submit">{% translate "Create account" %}</button>
+                <a class="button secondary" href="{% url 'accounts:login' %}">{% translate "Already have an account" %}</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

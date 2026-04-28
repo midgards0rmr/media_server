@@ -1,0 +1,576 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: media-server\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-19 00:00+0000\n"
+"PO-Revision-Date: 2026-04-19 00:00+0000\n"
+"Last-Translator: Codex\n"
+"Language: en\n"
+"Language-Team: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Movie"
+msgstr "Movie"
+
+msgid "Series"
+msgstr "Series"
+
+msgid "Anime"
+msgstr "Anime"
+
+msgid "Cartoon"
+msgstr "Cartoon"
+
+msgid "Documentary"
+msgstr "Documentary"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Cover"
+msgstr "Cover"
+
+msgid "Poster"
+msgstr "Poster"
+
+msgid "Backdrop"
+msgstr "Backdrop"
+
+msgid "Screenshot"
+msgstr "Screenshot"
+
+msgid "Thumbnail"
+msgstr "Thumbnail"
+
+msgid "Announced"
+msgstr "Announced"
+
+msgid "Ongoing"
+msgstr "Ongoing"
+
+msgid "Released"
+msgstr "Released"
+
+msgid "Archived"
+msgstr "Archived"
+
+msgid "Title"
+msgstr "Title"
+
+msgid "Title localizations"
+msgstr "Title localizations"
+
+msgid "Original title"
+msgstr "Original title"
+
+msgid "Slug"
+msgstr "Slug"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Description localizations"
+msgstr "Description localizations"
+
+msgid "Media type"
+msgstr "Media type"
+
+msgid "Image type"
+msgstr "Image type"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Pending"
+msgstr "Pending"
+
+msgid "Running"
+msgstr "Running"
+
+msgid "Done"
+msgstr "Done"
+
+msgid "Failed"
+msgstr "Failed"
+
+msgid "Queued"
+msgstr "Queued"
+
+msgid "Analyzing tracks"
+msgstr "Analyzing tracks"
+
+msgid "Extracting subtitles"
+msgstr "Extracting subtitles"
+
+msgid "Generating HLS"
+msgstr "Generating HLS"
+
+msgid "Finished"
+msgstr "Finished"
+
+msgid "Stage"
+msgstr "Stage"
+
+msgid "Progress"
+msgstr "Progress"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Release year"
+msgstr "Release year"
+
+msgid "Season"
+msgstr "Season"
+
+msgid "Episode"
+msgstr "Episode"
+
+msgid "Duration (min)"
+msgstr "Duration (min)"
+
+msgid "Genres"
+msgstr "Genres"
+
+msgid "Countries"
+msgstr "Countries"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Age rating"
+msgstr "Age rating"
+
+msgid "Quality"
+msgstr "Quality"
+
+msgid "Video codec"
+msgstr "Video codec"
+
+msgid "Audio codec"
+msgstr "Audio codec"
+
+msgid "Audio tracks"
+msgstr "Audio tracks"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio track"
+msgstr "Audio track"
+
+msgid "Subtitles"
+msgstr "Subtitles"
+
+msgid "Subtitle track"
+msgstr "Subtitle track"
+
+msgid "Off"
+msgstr "Off"
+
+msgid "Subtitle tracks"
+msgstr "Subtitle tracks"
+
+msgid "not supported by browser"
+msgstr "not supported by browser"
+
+msgid "available in player"
+msgstr "available in player"
+
+msgid "not extractable"
+msgstr "not extractable"
+
+msgid "File"
+msgstr "File"
+
+msgid "Playable file"
+msgstr "Playable file"
+
+msgid "File size"
+msgstr "File size"
+
+msgid "Playable file size"
+msgstr "Playable file size"
+
+msgid "Playable error"
+msgstr "Playable error"
+
+msgid "HLS manifest"
+msgstr "HLS manifest"
+
+msgid "HLS error"
+msgstr "HLS error"
+
+msgid "HLS audio switching is available"
+msgstr "HLS audio switching is available"
+
+msgid "HLS generation failed"
+msgstr "HLS generation failed"
+
+msgid "This browser cannot play HLS video."
+msgstr "This browser cannot play HLS video."
+
+msgid "Browser playable audio is available"
+msgstr "Browser playable audio is available"
+
+msgid "Browser playable audio failed"
+msgstr "Browser playable audio failed"
+
+msgid "Maximum upload size: %(size)s. Large files are stored through a disk temporary directory."
+msgstr "Maximum upload size: %(size)s. Large files are stored through a disk temporary directory."
+
+msgid "File is too large. Maximum allowed size is %(size)s."
+msgstr "File is too large. Maximum allowed size is %(size)s."
+
+msgid "File was saved, but media tracks could not be analyzed: %(error)s"
+msgstr "File was saved, but media tracks could not be analyzed: %(error)s"
+
+msgid "Media tracks were analyzed."
+msgstr "Media tracks were analyzed."
+
+msgid "File was uploaded and queued for processing."
+msgstr "File was uploaded and queued for processing."
+
+msgid "Processing"
+msgstr "Processing"
+
+msgid "After upload, processing will be queued. Run the media worker to analyze tracks and generate HLS."
+msgstr "After upload, processing will be queued. Run the media worker to analyze tracks and generate HLS."
+
+msgid "Media processing job"
+msgstr "Media processing job"
+
+msgid "Media processing jobs"
+msgstr "Media processing jobs"
+
+msgid "File not found."
+msgstr "File not found."
+
+msgid "%(count)s media file was analyzed."
+msgid_plural "%(count)s media files were analyzed."
+msgstr[0] "%(count)s media file was analyzed."
+msgstr[1] "%(count)s media files were analyzed."
+
+msgid "%(count)s media file could not be analyzed."
+msgid_plural "%(count)s media files could not be analyzed."
+msgstr[0] "%(count)s media file could not be analyzed."
+msgstr[1] "%(count)s media files could not be analyzed."
+
+msgid "%(count)s browser playable file was generated."
+msgid_plural "%(count)s browser playable files were generated."
+msgstr[0] "%(count)s browser playable file was generated."
+msgstr[1] "%(count)s browser playable files were generated."
+
+msgid "%(count)s browser playable file could not be generated."
+msgid_plural "%(count)s browser playable files could not be generated."
+msgstr[0] "%(count)s browser playable file could not be generated."
+msgstr[1] "%(count)s browser playable files could not be generated."
+
+msgid "%(count)s HLS stream was generated."
+msgid_plural "%(count)s HLS streams were generated."
+msgstr[0] "%(count)s HLS stream was generated."
+msgstr[1] "%(count)s HLS streams were generated."
+
+msgid "%(count)s HLS stream could not be generated."
+msgid_plural "%(count)s HLS streams could not be generated."
+msgstr[0] "%(count)s HLS stream could not be generated."
+msgstr[1] "%(count)s HLS streams could not be generated."
+
+msgid "Source path"
+msgstr "Source path"
+
+msgid "Checksum"
+msgstr "Checksum"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Alt text"
+msgstr "Alt text"
+
+msgid "Caption"
+msgstr "Caption"
+
+msgid "Sort order"
+msgstr "Sort order"
+
+msgid "Is primary"
+msgstr "Is primary"
+
+msgid "Width"
+msgstr "Width"
+
+msgid "Height"
+msgstr "Height"
+
+msgid "Created at"
+msgstr "Created at"
+
+msgid "Updated at"
+msgstr "Updated at"
+
+msgid "Media file"
+msgstr "Media file"
+
+msgid "Media files"
+msgstr "Media files"
+
+msgid "Media image"
+msgstr "Media image"
+
+msgid "Media images"
+msgstr "Media images"
+
+msgid "Media Server"
+msgstr "Media Server"
+
+msgid "Catalog of local movies, series, and anime."
+msgstr "Catalog of local movies, series, and anime."
+
+msgid "Log out"
+msgstr "Log out"
+
+msgid "Log in"
+msgstr "Log in"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Add"
+msgstr "Add"
+
+msgid "Add file"
+msgstr "Add file"
+
+msgid "Add season"
+msgstr "Add season"
+
+msgid "Add episode"
+msgstr "Add episode"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Russian"
+msgstr "Russian"
+
+msgid "English"
+msgstr "English"
+
+msgid "Filters"
+msgstr "Filters"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Title or description"
+msgstr "Title or description"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "All"
+msgstr "All"
+
+msgid "Year"
+msgstr "Year"
+
+msgid "Genres are not filled in yet."
+msgstr "Genres are not filled in yet."
+
+msgid "Apply"
+msgstr "Apply"
+
+msgid "Reset"
+msgstr "Reset"
+
+msgid "Catalog"
+msgstr "Catalog"
+
+msgid "items"
+msgstr "items"
+
+msgid "No poster"
+msgstr "No poster"
+
+msgid "Season %(media_file.season_number)s"
+msgstr "Season %(media_file.season_number)s"
+
+msgid "Episode %(media_file.episode_number)s"
+msgstr "Episode %(media_file.episode_number)s"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Catalog is empty."
+msgstr "Catalog is empty."
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Seasons"
+msgstr "Seasons"
+
+msgid "Files"
+msgstr "Files"
+
+msgid "Season %(num)s"
+msgstr "Season %(num)s"
+
+msgid "%(count)s episode"
+msgid_plural "%(count)s episodes"
+msgstr[0] "%(count)s episode"
+msgstr[1] "%(count)s episodes"
+
+msgid "Information"
+msgstr "Information"
+
+msgid "%(media_file.file_size)s bytes"
+msgstr "%(media_file.file_size)s bytes"
+
+msgid "Images"
+msgstr "Images"
+
+msgid "Create account"
+msgstr "Create account"
+
+msgid "Already have an account"
+msgstr "Already have an account"
+
+msgid "Account"
+msgstr "Account"
+
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "User"
+msgstr "User"
+
+msgid "You are not logged in."
+msgstr "You are not logged in."
+
+msgid "Metadata import"
+msgstr "Metadata import"
+
+msgid "Enter a title, choose a match with a poster, and we will fill in the main fields automatically."
+msgstr "Enter a title, choose a match with a poster, and we will fill in the main fields automatically."
+
+msgid "Title search"
+msgstr "Title search"
+
+msgid "For example: Interstellar or Attack on Titan"
+msgstr "For example: Interstellar or Attack on Titan"
+
+msgid "Find matches"
+msgstr "Find matches"
+
+msgid "TMDB import is disabled. Set TMDB_API_KEY or TMDB_READ_ACCESS_TOKEN in the environment to enable search and autofill."
+msgstr "TMDB import is disabled. Set TMDB_API_KEY or TMDB_READ_ACCESS_TOKEN in the environment to enable search and autofill."
+
+msgid "New media"
+msgstr "New media"
+
+msgid "Main information"
+msgstr "Main information"
+
+msgid "Advanced fields"
+msgstr "Advanced fields"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Nothing found."
+msgstr "Nothing found."
+
+msgid "Choose one of the matches below."
+msgstr "Choose one of the matches below."
+
+msgid "Use this"
+msgstr "Use this"
+
+msgid "Enter a title first."
+msgstr "Enter a title first."
+
+msgid "Searching..."
+msgstr "Searching..."
+
+msgid "Search failed."
+msgstr "Search failed."
+
+msgid "Loading details..."
+msgstr "Loading details..."
+
+msgid "Unable to load details."
+msgstr "Unable to load details."
+
+msgid "Fields are filled. Check them and save the record."
+msgstr "Fields are filled. Check them and save the record."
+
+msgid "Editing %(title)s"
+msgstr "Editing %(title)s"
+
+msgid "Season import"
+msgstr "Season import"
+
+msgid "Search TMDB by the parent title, choose the correct series, then choose a season."
+msgstr "Search TMDB by the parent title, choose the correct series, then choose a season."
+
+msgid "Parent title"
+msgstr "Parent title"
+
+msgid "Series title"
+msgstr "Series title"
+
+msgid "Find series"
+msgstr "Find series"
+
+msgid "Choose the parent series."
+msgstr "Choose the parent series."
+
+msgid "Choose series"
+msgstr "Choose series"
+
+msgid "No seasons found."
+msgstr "No seasons found."
+
+msgid "episodes"
+msgstr "episodes"
+
+msgid "Choose a season."
+msgstr "Choose a season."
+
+msgid "Loading seasons..."
+msgstr "Loading seasons..."
+
+msgid "Episode import"
+msgstr "Episode import"
+
+msgid "Search TMDB by the parent title, choose the correct series, then choose an episode from the current season."
+msgstr "Search TMDB by the parent title, choose the correct series, then choose an episode from the current season."
+
+msgid "No episodes found."
+msgstr "No episodes found."
+
+msgid "Loading episodes..."
+msgstr "Loading episodes..."
+
+msgid "Choose an episode."
+msgstr "Choose an episode."
+
+msgid "Episode picker"
+msgstr "Episode picker"
+
+msgid "min"
+msgstr "min"

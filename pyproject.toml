@@ -1,0 +1,21 @@
+[project]
+name = "media-server"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "midgards0rmr",email = "ivanmanin54@gmail.com"}
+]
+requires-python = ">=3.14,<4.0"
+dependencies = [
+    "django (>=6.0.4,<7.0.0)",
+    "psycopg2 (>=2.9.11,<3.0.0)",
+    "django-environ (>=0.13.0,<0.14.0)",
+    "pillow (>=12.2.0,<13.0.0)",
+    "djangorestframework (>=3.17.1,<4.0.0)",
+    "djangorestframework-simplejwt (>=5.5.1,<6.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

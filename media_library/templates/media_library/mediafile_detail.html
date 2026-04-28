@@ -1,0 +1,417 @@
+{% extends "media_library/base.html" %}
+{% load i18n static media_localization %}
+
+{% block title %}{{ media_file|localized_title }}{% endblock %}
+
+{% block content %}
+    <div class="detail-layout">
+        <section class="panel detail-main">
+            <div class="section-header">
+                <div>
+                    <h2>{{ media_file|localized_title }}</h2>
+                    <div class="meta">
+                        {{ media_file.get_media_type_display }}
+                        {% if media_file.release_year %} • {{ media_file.release_year }}{% endif %}
+                    </div>
+                </div>
+                {% if request.user.is_staff %}
+                    <div class="actions">
+                        <a class="button secondary" href="{% url 'media_library:mediafile_update' media_file.slug %}">{% translate "Edit" %}</a>
+                        <a class="button secondary" href="{% url 'media_library:title_variant_create' media_file.slug %}">{% translate "Add file" %}</a>
+                        {% if media_file.is_serialized %}
+                            <a class="button secondary" href="{% url 'media_library:season_create' media_file.slug %}">{% translate "Add season" %}</a>
+                        {% endif %}
+                        <a class="button danger" href="{% url 'media_library:mediafile_delete' media_file.slug %}">{% translate "Delete" %}</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% with description=media_file|localized_description %}
+                {% if description %}
+                    <p class="media-description">{{ description }}</p>
+                {% endif %}
+            {% endwith %}
+
+            {% with primary_variant=media_file.get_primary_variant %}
+                {% if primary_variant %}
+                    {% with job=primary_variant.processing_jobs.first %}
+                        {% if job %}
+                            {% if job.status == "done" %}
+                            {% else %}
+                                <div
+                                    class="progress-card"
+                                    data-processing-job
+                                    data-status-url="{% url 'media_library:media_processing_job_status' job.pk %}"
+                                >
+                                    <div class="progress-top">
+                                        <span data-processing-stage>{% translate "Processing" %}: {{ job.get_stage_display }}</span>
+                                        <span data-processing-percent>{{ job.progress }}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div data-processing-fill class="progress-fill" style="width: {{ job.progress }}%;"></div>
+                                    </div>
+                                    {% if job.error %}
+                                        <div data-processing-message class="meta">{{ job.error|truncatechars:180 }}</div>
+                                    {% elif job.message %}
+                                        <div data-processing-message class="meta">{{ job.message }}</div>
+                                    {% else %}
+                                        <div data-processing-message class="meta"></div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="media-preview">
+                        <div class="player-shell">
+                            <video
+                                id="media-player"
+                                controls
+                                preload="metadata"
+                                {% if primary_variant.hls_manifest %}data-hls-src="{{ primary_variant.hls_manifest }}"{% endif %}
+                            >
+                                {% if primary_variant.hls_manifest %}
+                                {% else %}
+                                    <source src="{% url 'media_library:media_variant_stream' primary_variant.pk %}">
+                                {% endif %}
+                                {% for track in primary_variant.subtitle_tracks %}
+                                    {% if track.vtt_url %}
+                                        <track
+                                            kind="subtitles"
+                                            src="{{ track.vtt_url }}"
+                                            srclang="{{ track.srclang|default:'und' }}"
+                                            label="{{ track.title|default:'Subtitles' }}"
+                                            {% if track.default %}default{% endif %}
+                                        >
+                                    {% endif %}
+                                {% endfor %}
+                            </video>
+                            <div class="player-track-controls" data-player-track-controls hidden>
+                                {% if primary_variant.hls_manifest %}
+                                    <label>
+                                        <span>{% translate "Audio" %}</span>
+                                        <select data-audio-track-select></select>
+                                    </label>
+                                {% endif %}
+                                {% if primary_variant.subtitle_tracks %}
+                                    <label>
+                                        <span>{% translate "Subtitles" %}</span>
+                                        <select data-subtitle-track-select>
+                                            <option value="-1">{% translate "Off" %}</option>
+                                        </select>
+                                    </label>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% if media_file.seasons.exists %}
+                <div class="section-header" style="margin-top: 18px;">
+                    <h3>{% translate "Seasons" %}</h3>
+                    {% if request.user.is_staff and media_file.is_serialized %}
+                        <a class="button secondary" href="{% url 'media_library:season_create' media_file.slug %}">{% translate "Add season" %}</a>
+                    {% endif %}
+                </div>
+                <div class="data-list">
+                    {% for season in media_file.seasons.all %}
+                        <div class="data-row">
+                            <div>
+                                <a href="{{ season.get_absolute_url }}">
+                                    {% if season.name %}{{ season.name }}{% else %}{% blocktranslate with num=season.season_number %}Season {{ num }}{% endblocktranslate %}{% endif %}
+                                </a>
+                            </div>
+                            <div class="meta">
+                                {% blocktranslate count count=season.episodes.count %}{{ count }} episode{% plural %}{{ count }} episodes{% endblocktranslate %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </section>
+
+        <aside class="panel detail-side">
+            <div class="section-header">
+                <h3>{% translate "Information" %}</h3>
+            </div>
+
+            <div class="data-list">
+                {% if media_file.original_title %}
+                    <div class="data-row">
+                        <div class="data-label">{% translate "Original title" %}</div>
+                        <div>{{ media_file.original_title }}</div>
+                    </div>
+                {% endif %}
+                <div class="data-row">
+                    <div class="data-label">{% translate "Status" %}</div>
+                    <div>{{ media_file.get_status_display }}</div>
+                </div>
+                {% if media_file.language %}
+                    <div class="data-row">
+                        <div class="data-label">{% translate "Language" %}</div>
+                        <div>{{ media_file.language }}</div>
+                    </div>
+                {% endif %}
+                {% if media_file.age_rating %}
+                    <div class="data-row">
+                        <div class="data-label">{% translate "Age rating" %}</div>
+                        <div>{{ media_file.age_rating }}</div>
+                    </div>
+                {% endif %}
+                {% if media_file.genres %}
+                    <div class="data-row">
+                        <div class="data-label">{% translate "Genres" %}</div>
+                        <div>{{ media_file.genres|join:", " }}</div>
+                    </div>
+                {% endif %}
+                {% if media_file.countries %}
+                    <div class="data-row">
+                        <div class="data-label">{% translate "Countries" %}</div>
+                        <div>{{ media_file.countries|join:", " }}</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if media_file.images.count %}
+                <div class="section-header" style="margin-top: 18px;">
+                    <h3>{% translate "Images" %}</h3>
+                </div>
+                <div class="gallery-grid">
+                    {% for image in media_file.images.all %}
+                        <a href="{{ image.image.url }}">
+                            {% with image_alt=media_file|localized_title %}
+                                <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:image_alt }}">
+                            {% endwith %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    {% with primary_variant=media_file.get_primary_variant %}
+        {% if primary_variant %}
+            <script src="{% static 'media_library/vendor/plyr.min.js' %}"></script>
+            {% if primary_variant.hls_manifest %}
+                <script src="{% static 'media_library/vendor/hls.min.js' %}"></script>
+            {% endif %}
+            <script>
+                (function () {
+                    var video = document.getElementById("media-player");
+                    if (!video) {
+                        return;
+                    }
+
+                    var hlsSrc = video.dataset.hlsSrc;
+                    function createPlayer() {
+                        if (!window.Plyr) {
+                            return null;
+                        }
+
+                        return new window.Plyr(video, {
+                            iconUrl: "{% static 'media_library/vendor/plyr.svg' %}",
+                            controls: [
+                                "play-large",
+                                "play",
+                                "progress",
+                                "current-time",
+                                "duration",
+                                "mute",
+                                "volume",
+                                "settings",
+                                "fullscreen"
+                            ],
+                            settings: ["captions", "speed", "loop"],
+                            captions: {active: false, update: true}
+                        });
+                    }
+
+                    function trackLabel(track, index) {
+                        return track.name || track.lang || "{% translate 'Audio track' %} " + (index + 1);
+                    }
+
+                    function syncAudioControl(player, hls) {
+                        if (!hls.audioTracks || hls.audioTracks.length < 2) {
+                            return false;
+                        }
+
+                        var select = document.querySelector("[data-audio-track-select]");
+                        if (!select) {
+                            return false;
+                        }
+
+                        if (hls.audioTrack < 0) {
+                            hls.audioTrack = hls.audioTracks.findIndex(function (track) {
+                                return track.default;
+                            });
+                            if (hls.audioTrack < 0) {
+                                hls.audioTrack = 0;
+                            }
+                        }
+
+                        select.innerHTML = "";
+                        hls.audioTracks.forEach(function (track, index) {
+                            var option = document.createElement("option");
+                            option.value = String(index);
+                            option.textContent = trackLabel(track, index);
+                            select.appendChild(option);
+                        });
+                        select.value = String(hls.audioTrack);
+                        revealTrackControls();
+                        return true;
+                    }
+
+                    function scheduleAudioControlSync(player, hls, attempt) {
+                        attempt = attempt || 0;
+                        if (syncAudioControl(player, hls) || attempt >= 20) {
+                            return;
+                        }
+
+                        window.setTimeout(function () {
+                            scheduleAudioControlSync(player, hls, attempt + 1);
+                        }, 100);
+                    }
+
+                    function revealTrackControls() {
+                        var controls = document.querySelector("[data-player-track-controls]");
+                        if (!controls) {
+                            return;
+                        }
+
+                        var visibleSelects = Array.from(controls.querySelectorAll("select")).filter(function (select) {
+                            return select.options.length > 1;
+                        });
+                        controls.hidden = visibleSelects.length === 0;
+                    }
+
+                    function setupSubtitleControl() {
+                        var select = document.querySelector("[data-subtitle-track-select]");
+                        if (!select || !video.textTracks) {
+                            return;
+                        }
+
+                        Array.from(video.textTracks).forEach(function (track, index) {
+                            track.mode = "disabled";
+
+                            var option = document.createElement("option");
+                            option.value = String(index);
+                            option.textContent = track.label || track.language || "{% translate 'Subtitle track' %} " + (index + 1);
+                            select.appendChild(option);
+
+                            if (track.mode === "showing") {
+                                select.value = String(index);
+                            }
+                        });
+
+                        select.addEventListener("change", function () {
+                            var selectedIndex = Number(select.value);
+                            Array.from(video.textTracks).forEach(function (track, index) {
+                                track.mode = index === selectedIndex ? "showing" : "disabled";
+                            });
+                        });
+
+                        revealTrackControls();
+                    }
+
+                    var player = createPlayer();
+                    setupSubtitleControl();
+                    document.addEventListener("fullscreenchange", function () {
+                        document.body.classList.toggle("is-player-fullscreen", Boolean(document.fullscreenElement));
+                    });
+                    document.addEventListener("webkitfullscreenchange", function () {
+                        document.body.classList.toggle("is-player-fullscreen", Boolean(document.webkitFullscreenElement));
+                    });
+
+                    if (!hlsSrc) {
+                        return;
+                    }
+
+                    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+                        video.src = hlsSrc;
+                    } else if (window.Hls && window.Hls.isSupported()) {
+                        var hls = new window.Hls({enableWorker: true});
+
+                        hls.loadSource(hlsSrc);
+                        hls.attachMedia(video);
+                        if (player) {
+                            player.on("ready", function () {
+                                scheduleAudioControlSync(player, hls);
+                            });
+                        }
+                        hls.on(window.Hls.Events.MANIFEST_PARSED, function () {
+                            scheduleAudioControlSync(player, hls);
+                        });
+                        hls.on(window.Hls.Events.AUDIO_TRACKS_UPDATED, function () {
+                            scheduleAudioControlSync(player, hls);
+                        });
+                        hls.on(window.Hls.Events.AUDIO_TRACK_SWITCHED, function () {
+                            var select = document.querySelector("[data-audio-track-select]");
+                            if (select) {
+                                select.value = String(hls.audioTrack);
+                            }
+                        });
+                        hls.on(window.Hls.Events.ERROR, function (event, data) {
+                            if (!data.fatal) {
+                                return;
+                            }
+
+                            video.insertAdjacentHTML(
+                                "afterend",
+                                "<p class=\"meta\">HLS error: " + data.type + " / " + data.details + "</p>"
+                            );
+                        });
+                    } else {
+                        video.insertAdjacentHTML(
+                            "afterend",
+                            "<p class=\"meta\">{% translate 'This browser cannot play HLS video.' %}</p>"
+                        );
+                    }
+                })();
+            </script>
+        {% endif %}
+    {% endwith %}
+    <script>
+        (function () {
+            var jobCards = document.querySelectorAll("[data-processing-job]");
+            if (!jobCards.length) {
+                return;
+            }
+
+            jobCards.forEach(function (card) {
+                var statusUrl = card.dataset.statusUrl;
+                var stageNode = card.querySelector("[data-processing-stage]");
+                var percentNode = card.querySelector("[data-processing-percent]");
+                var fillNode = card.querySelector("[data-processing-fill]");
+                var messageNode = card.querySelector("[data-processing-message]");
+
+                function updateJob() {
+                    fetch(statusUrl, {headers: {"X-Requested-With": "XMLHttpRequest"}})
+                        .then(function (response) {
+                            if (!response.ok) {
+                                throw new Error("status request failed");
+                            }
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            stageNode.textContent = "{% translate 'Processing' %}: " + data.stage_display;
+                            percentNode.textContent = data.progress + "%";
+                            fillNode.style.width = data.progress + "%";
+                            messageNode.textContent = data.error || data.message || "";
+
+                            if (data.status !== "done" && data.status !== "failed") {
+                                window.setTimeout(updateJob, 3000);
+                            }
+                        })
+                        .catch(function () {
+                            window.setTimeout(updateJob, 5000);
+                        });
+                }
+
+                window.setTimeout(updateJob, 1000);
+            });
+        })();
+    </script>
+{% endblock %}

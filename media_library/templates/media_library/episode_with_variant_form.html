@@ -1,0 +1,37 @@
+{% extends "media_library/base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Add episode with file" %}{% endblock %}
+
+{% block content %}
+    <section class="panel section" style="max-width: 820px;">
+        <div class="section-header">
+            <div>
+                <h2>{% translate "Add episode with file" %}</h2>
+                <div class="meta">{{ season }}</div>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="section-header">
+                <h3>{% translate "Episode" %}</h3>
+            </div>
+            {{ episode_form.as_p }}
+
+            <div class="section-header" style="margin-top: 18px;">
+                <h3>{% translate "File" %}</h3>
+            </div>
+            <div class="upload-drop">
+                {{ variant_form.as_p }}
+                <p class="meta">{% translate "After upload, processing will be queued. Run the media worker to analyze tracks and generate HLS." %}</p>
+            </div>
+
+            <div class="actions">
+                <button type="submit">{% translate "Save" %}</button>
+                <a class="button secondary" href="{{ cancel_url }}">{% translate "Cancel" %}</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

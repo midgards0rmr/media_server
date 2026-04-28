@@ -1,0 +1,583 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: media-server\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-19 00:00+0000\n"
+"PO-Revision-Date: 2026-04-19 00:00+0000\n"
+"Last-Translator: Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Movie"
+msgstr "Фильм"
+
+msgid "Series"
+msgstr "Сериал"
+
+msgid "Anime"
+msgstr "Аниме"
+
+msgid "Cartoon"
+msgstr "Мультфильм"
+
+msgid "Documentary"
+msgstr "Документальный"
+
+msgid "Other"
+msgstr "Другое"
+
+msgid "Cover"
+msgstr "Обложка"
+
+msgid "Poster"
+msgstr "Постер"
+
+msgid "Backdrop"
+msgstr "Фон"
+
+msgid "Screenshot"
+msgstr "Скриншот"
+
+msgid "Thumbnail"
+msgstr "Миниатюра"
+
+msgid "Announced"
+msgstr "Анонсировано"
+
+msgid "Ongoing"
+msgstr "Выходит"
+
+msgid "Released"
+msgstr "Вышло"
+
+msgid "Archived"
+msgstr "В архиве"
+
+msgid "Title"
+msgstr "Название"
+
+msgid "Title localizations"
+msgstr "Локализации названия"
+
+msgid "Original title"
+msgstr "Оригинальное название"
+
+msgid "Slug"
+msgstr "Слаг"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Description localizations"
+msgstr "Локализации описания"
+
+msgid "Media type"
+msgstr "Тип медиа"
+
+msgid "Image type"
+msgstr "Тип изображения"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Pending"
+msgstr "Ожидает"
+
+msgid "Running"
+msgstr "Выполняется"
+
+msgid "Done"
+msgstr "Готово"
+
+msgid "Failed"
+msgstr "Ошибка"
+
+msgid "Queued"
+msgstr "В очереди"
+
+msgid "Analyzing tracks"
+msgstr "Анализ дорожек"
+
+msgid "Extracting subtitles"
+msgstr "Извлечение субтитров"
+
+msgid "Generating HLS"
+msgstr "Генерация HLS"
+
+msgid "Finished"
+msgstr "Завершено"
+
+msgid "Stage"
+msgstr "Этап"
+
+msgid "Progress"
+msgstr "Прогресс"
+
+msgid "Message"
+msgstr "Сообщение"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Release year"
+msgstr "Год выхода"
+
+msgid "Season"
+msgstr "Сезон"
+
+msgid "Episode"
+msgstr "Эпизод"
+
+msgid "Duration (min)"
+msgstr "Длительность (мин)"
+
+msgid "Genres"
+msgstr "Жанры"
+
+msgid "Countries"
+msgstr "Страны"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Age rating"
+msgstr "Возрастной рейтинг"
+
+msgid "Quality"
+msgstr "Качество"
+
+msgid "Video codec"
+msgstr "Видеокодек"
+
+msgid "Audio codec"
+msgstr "Аудиокодек"
+
+msgid "Audio tracks"
+msgstr "Аудиодорожки"
+
+msgid "Audio"
+msgstr "Аудио"
+
+msgid "Audio track"
+msgstr "Аудиодорожка"
+
+msgid "Subtitles"
+msgstr "Субтитры"
+
+msgid "Subtitle track"
+msgstr "Дорожка субтитров"
+
+msgid "Off"
+msgstr "Выключено"
+
+msgid "Subtitle tracks"
+msgstr "Субтитры"
+
+msgid "not supported by browser"
+msgstr "не поддерживается браузером"
+
+msgid "available in player"
+msgstr "доступно в плеере"
+
+msgid "not extractable"
+msgstr "нельзя извлечь"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "Playable file"
+msgstr "Файл для браузера"
+
+msgid "File size"
+msgstr "Размер файла"
+
+msgid "Playable file size"
+msgstr "Размер файла для браузера"
+
+msgid "Playable error"
+msgstr "Ошибка подготовки файла для браузера"
+
+msgid "HLS manifest"
+msgstr "HLS manifest"
+
+msgid "HLS error"
+msgstr "Ошибка HLS"
+
+msgid "HLS audio switching is available"
+msgstr "Переключение аудиодорожек через HLS доступно"
+
+msgid "HLS generation failed"
+msgstr "Не удалось создать HLS"
+
+msgid "This browser cannot play HLS video."
+msgstr "Этот браузер не может воспроизвести HLS-видео."
+
+msgid "Browser playable audio is available"
+msgstr "Звук для браузерного плеера подготовлен"
+
+msgid "Browser playable audio failed"
+msgstr "Не удалось подготовить звук для браузерного плеера"
+
+msgid "Maximum upload size: %(size)s. Large files are stored through a disk temporary directory."
+msgstr "Максимальный размер загрузки: %(size)s. Большие файлы сохраняются через временный каталог на диске."
+
+msgid "File is too large. Maximum allowed size is %(size)s."
+msgstr "Файл слишком большой. Максимально допустимый размер: %(size)s."
+
+msgid "File was saved, but media tracks could not be analyzed: %(error)s"
+msgstr "Файл сохранён, но дорожки не удалось проанализировать: %(error)s"
+
+msgid "Media tracks were analyzed."
+msgstr "Дорожки медиафайла проанализированы."
+
+msgid "File was uploaded and queued for processing."
+msgstr "Файл загружен и поставлен в очередь обработки."
+
+msgid "Processing"
+msgstr "Обработка"
+
+msgid "After upload, processing will be queued. Run the media worker to analyze tracks and generate HLS."
+msgstr "После загрузки файл попадёт в очередь обработки. Запусти media worker, чтобы проанализировать дорожки и сгенерировать HLS."
+
+msgid "Media processing job"
+msgstr "Задача обработки медиа"
+
+msgid "Media processing jobs"
+msgstr "Задачи обработки медиа"
+
+msgid "File not found."
+msgstr "Файл не найден."
+
+msgid "%(count)s media file was analyzed."
+msgid_plural "%(count)s media files were analyzed."
+msgstr[0] "%(count)s медиафайл проанализирован."
+msgstr[1] "%(count)s медиафайла проанализированы."
+msgstr[2] "%(count)s медиафайлов проанализированы."
+
+msgid "%(count)s media file could not be analyzed."
+msgid_plural "%(count)s media files could not be analyzed."
+msgstr[0] "%(count)s медиафайл не удалось проанализировать."
+msgstr[1] "%(count)s медиафайла не удалось проанализировать."
+msgstr[2] "%(count)s медиафайлов не удалось проанализировать."
+
+msgid "%(count)s browser playable file was generated."
+msgid_plural "%(count)s browser playable files were generated."
+msgstr[0] "%(count)s файл для браузера создан."
+msgstr[1] "%(count)s файла для браузера созданы."
+msgstr[2] "%(count)s файлов для браузера созданы."
+
+msgid "%(count)s browser playable file could not be generated."
+msgid_plural "%(count)s browser playable files could not be generated."
+msgstr[0] "%(count)s файл для браузера не удалось создать."
+msgstr[1] "%(count)s файла для браузера не удалось создать."
+msgstr[2] "%(count)s файлов для браузера не удалось создать."
+
+msgid "%(count)s HLS stream was generated."
+msgid_plural "%(count)s HLS streams were generated."
+msgstr[0] "%(count)s HLS-поток создан."
+msgstr[1] "%(count)s HLS-потока созданы."
+msgstr[2] "%(count)s HLS-потоков созданы."
+
+msgid "%(count)s HLS stream could not be generated."
+msgid_plural "%(count)s HLS streams could not be generated."
+msgstr[0] "%(count)s HLS-поток не удалось создать."
+msgstr[1] "%(count)s HLS-потока не удалось создать."
+msgstr[2] "%(count)s HLS-потоков не удалось создать."
+
+msgid "Source path"
+msgstr "Исходный путь"
+
+msgid "Checksum"
+msgstr "Контрольная сумма"
+
+msgid "Image"
+msgstr "Изображение"
+
+msgid "Alt text"
+msgstr "Альтернативный текст"
+
+msgid "Caption"
+msgstr "Подпись"
+
+msgid "Sort order"
+msgstr "Порядок сортировки"
+
+msgid "Is primary"
+msgstr "Основное"
+
+msgid "Width"
+msgstr "Ширина"
+
+msgid "Height"
+msgstr "Высота"
+
+msgid "Created at"
+msgstr "Создано"
+
+msgid "Updated at"
+msgstr "Обновлено"
+
+msgid "Media file"
+msgstr "Медиафайл"
+
+msgid "Media files"
+msgstr "Медиафайлы"
+
+msgid "Media image"
+msgstr "Изображение медиа"
+
+msgid "Media images"
+msgstr "Изображения медиа"
+
+msgid "Media Server"
+msgstr "Медиасервер"
+
+msgid "Catalog of local movies, series, and anime."
+msgstr "Каталог локальных фильмов, сериалов и аниме."
+
+msgid "Log out"
+msgstr "Выйти"
+
+msgid "Log in"
+msgstr "Войти"
+
+msgid "Register"
+msgstr "Регистрация"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Add file"
+msgstr "Добавить файл"
+
+msgid "Add season"
+msgstr "Добавить сезон"
+
+msgid "Add episode"
+msgstr "Добавить серию"
+
+msgid "Admin"
+msgstr "Админка"
+
+msgid "Russian"
+msgstr "Русский"
+
+msgid "English"
+msgstr "Английский"
+
+msgid "Filters"
+msgstr "Фильтры"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Title or description"
+msgstr "Название или описание"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "All"
+msgstr "Все"
+
+msgid "Year"
+msgstr "Год"
+
+msgid "Genres are not filled in yet."
+msgstr "Жанры пока не заполнены."
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Catalog"
+msgstr "Каталог"
+
+msgid "items"
+msgstr "шт."
+
+msgid "No poster"
+msgstr "Нет постера"
+
+msgid "Season %(media_file.season_number)s"
+msgstr "Сезон %(media_file.season_number)s"
+
+msgid "Episode %(media_file.episode_number)s"
+msgstr "Эпизод %(media_file.episode_number)s"
+
+msgid "Open"
+msgstr "Открыть"
+
+msgid "Edit"
+msgstr "Изменить"
+
+msgid "Catalog is empty."
+msgstr "Каталог пуст."
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Seasons"
+msgstr "Сезоны"
+
+msgid "Files"
+msgstr "Файлы"
+
+msgid "Season %(num)s"
+msgstr "Сезон %(num)s"
+
+msgid "%(count)s episode"
+msgid_plural "%(count)s episodes"
+msgstr[0] "%(count)s серия"
+msgstr[1] "%(count)s серии"
+msgstr[2] "%(count)s серий"
+
+msgid "Information"
+msgstr "Информация"
+
+msgid "%(media_file.file_size)s bytes"
+msgstr "%(media_file.file_size)s байт"
+
+msgid "Images"
+msgstr "Изображения"
+
+msgid "Create account"
+msgstr "Создать аккаунт"
+
+msgid "Already have an account"
+msgstr "Уже есть аккаунт"
+
+msgid "Account"
+msgstr "Аккаунт"
+
+msgid "Administrator"
+msgstr "Администратор"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "You are not logged in."
+msgstr "Ты не авторизован."
+
+msgid "Metadata import"
+msgstr "Импорт метаданных"
+
+msgid "Enter a title, choose a match with a poster, and we will fill in the main fields automatically."
+msgstr "Введи название, выбери подходящий вариант с постером, и мы автоматически заполним основные поля."
+
+msgid "Title search"
+msgstr "Поиск по названию"
+
+msgid "For example: Interstellar or Attack on Titan"
+msgstr "Например: Интерстеллар или Атака титанов"
+
+msgid "Find matches"
+msgstr "Найти варианты"
+
+msgid "TMDB import is disabled. Set TMDB_API_KEY or TMDB_READ_ACCESS_TOKEN in the environment to enable search and autofill."
+msgstr "Импорт из TMDB отключен. Укажи TMDB_API_KEY или TMDB_READ_ACCESS_TOKEN в окружении, чтобы включить поиск и автозаполнение."
+
+msgid "New media"
+msgstr "Новое медиа"
+
+msgid "Main information"
+msgstr "Основная информация"
+
+msgid "Advanced fields"
+msgstr "Дополнительные поля"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Nothing found."
+msgstr "Ничего не найдено."
+
+msgid "Choose one of the matches below."
+msgstr "Выбери один из найденных вариантов ниже."
+
+msgid "Use this"
+msgstr "Использовать"
+
+msgid "Enter a title first."
+msgstr "Сначала введи название."
+
+msgid "Searching..."
+msgstr "Поиск..."
+
+msgid "Search failed."
+msgstr "Не удалось выполнить поиск."
+
+msgid "Loading details..."
+msgstr "Загрузка деталей..."
+
+msgid "Unable to load details."
+msgstr "Не удалось загрузить детали."
+
+msgid "Fields are filled. Check them and save the record."
+msgstr "Поля заполнены. Проверь их и сохрани запись."
+
+msgid "Editing %(title)s"
+msgstr "Редактирование %(title)s"
+
+msgid "Season import"
+msgstr "Импорт сезона"
+
+msgid "Search TMDB by the parent title, choose the correct series, then choose a season."
+msgstr "Найди тайтл в TMDB по названию родительского сериала, выбери нужный сериал, затем выбери сезон."
+
+msgid "Parent title"
+msgstr "Родительский тайтл"
+
+msgid "Series title"
+msgstr "Название сериала"
+
+msgid "Find series"
+msgstr "Найти сериал"
+
+msgid "Choose the parent series."
+msgstr "Выбери родительский сериал."
+
+msgid "Choose series"
+msgstr "Выбрать сериал"
+
+msgid "No seasons found."
+msgstr "Сезоны не найдены."
+
+msgid "episodes"
+msgstr "серий"
+
+msgid "Choose a season."
+msgstr "Выбери сезон."
+
+msgid "Loading seasons..."
+msgstr "Загрузка сезонов..."
+
+msgid "Episode import"
+msgstr "Импорт серии"
+
+msgid "Search TMDB by the parent title, choose the correct series, then choose an episode from the current season."
+msgstr "Найди тайтл в TMDB по названию родительского сериала, выбери нужный сериал, затем выбери серию из текущего сезона."
+
+msgid "No episodes found."
+msgstr "Серии не найдены."
+
+msgid "Loading episodes..."
+msgstr "Загрузка серий..."
+
+msgid "Choose an episode."
+msgstr "Выбери серию."
+
+msgid "Episode picker"
+msgstr "Выбор серии"
+
+msgid "min"
+msgstr "мин"
