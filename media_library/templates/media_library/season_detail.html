@@ -77,6 +77,20 @@
                     return true;
                 }
 
+                function setupAudioControl(hls) {
+                    var select = document.querySelector("[data-audio-track-select]");
+                    if (!select) {
+                        return;
+                    }
+
+                    select.addEventListener("change", function () {
+                        var selectedIndex = Number(select.value);
+                        if (selectedIndex >= 0) {
+                            hls.audioTrack = selectedIndex;
+                        }
+                    });
+                }
+
                 function scheduleAudioControlSync(player, hls, attempt) {
                     attempt = attempt || 0;
                     if (syncAudioControl(player, hls) || attempt >= 20) {
@@ -107,6 +121,7 @@
                     }
 
                     Array.from(video.textTracks).forEach(function (track, index) {
+                        var isShowing = track.mode === "showing";
                         track.mode = "disabled";
 
                         var option = document.createElement("option");
@@ -114,7 +129,7 @@
                         option.textContent = track.label || track.language || "{% translate 'Subtitle track' %} " + (index + 1);
                         select.appendChild(option);
 
-                        if (track.mode === "showing") {
+                        if (isShowing || track.default) {
                             select.value = String(index);
                         }
                     });
@@ -149,6 +164,7 @@
 
                     hls.loadSource(hlsSrc);
                     hls.attachMedia(video);
+                    setupAudioControl(hls);
                     if (player) {
                         player.on("ready", function () {
                             scheduleAudioControlSync(player, hls);
@@ -185,47 +201,55 @@
             })();
         </script>
     {% endif %}
-    <script>
-        (function () {
-            var jobCards = document.querySelectorAll("[data-processing-job]");
-            if (!jobCards.length) {
-                return;
-            }
-
-            jobCards.forEach(function (card) {
-                var statusUrl = card.dataset.statusUrl;
-                var stageNode = card.querySelector("[data-processing-stage]");
-                var percentNode = card.querySelector("[data-processing-percent]");
-                var fillNode = card.querySelector("[data-processing-fill]");
-                var messageNode = card.querySelector("[data-processing-message]");
-
-                function updateJob() {
-                    fetch(statusUrl, {headers: {"X-Requested-With": "XMLHttpRequest"}})
-                        .then(function (response) {
-                            if (!response.ok) {
-                                throw new Error("status request failed");
-                            }
-                            return response.json();
-                        })
-                        .then(function (data) {
-                            stageNode.textContent = "{% translate 'Processing' %}: " + data.stage_display;
-                            percentNode.textContent = data.progress + "%";
-                            fillNode.style.width = data.progress + "%";
-                            messageNode.textContent = data.error || data.message || "";
-
-                            if (data.status !== "done" && data.status !== "failed") {
-                                window.setTimeout(updateJob, 3000);
-                            }
-                        })
-                        .catch(function () {
-                            window.setTimeout(updateJob, 5000);
-                        });
+    {% if request.user.is_staff %}
+        <script>
+            (function () {
+                var jobCards = document.querySelectorAll("[data-processing-job]");
+                if (!jobCards.length) {
+                    return;
                 }
 
-                window.setTimeout(updateJob, 1000);
-            });
-        })();
-    </script>
+                jobCards.forEach(function (card) {
+                    var statusUrl = card.dataset.statusUrl;
+                    var stageNode = card.querySelector("[data-processing-stage]");
+                    var percentNode = card.querySelector("[data-processing-percent]");
+                    var fillNode = card.querySelector("[data-processing-fill]");
+                    var messageNode = card.querySelector("[data-processing-message]");
+
+                    function updateJob() {
+                        fetch(statusUrl, {headers: {"X-Requested-With": "XMLHttpRequest"}})
+                            .then(function (response) {
+                                var contentType = response.headers.get("content-type") || "";
+                                if (!response.ok || contentType.indexOf("application/json") === -1) {
+                                    throw new Error("status request failed");
+                                }
+                                return response.json();
+                            })
+                            .then(function (data) {
+                                if (data.status === "done") {
+                                    card.remove();
+                                    return;
+                                }
+
+                                stageNode.textContent = "{% translate 'Processing' %}: " + data.stage_display;
+                                percentNode.textContent = data.progress + "%";
+                                fillNode.style.width = data.progress + "%";
+                                messageNode.textContent = data.error || data.message || "";
+
+                                if (data.status !== "failed") {
+                                    window.setTimeout(updateJob, 3000);
+                                }
+                            })
+                            .catch(function () {
+                                window.setTimeout(updateJob, 5000);
+                            });
+                    }
+
+                    window.setTimeout(updateJob, 1000);
+                });
+            })();
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -252,33 +276,34 @@
             {% endif %}
 
             {% if active_variant %}
-                {% with job=active_variant.processing_jobs.first %}
-                    {% if job %}
-                        {% if job.status == "done" %}
-                        {% else %}
-                            <div
-                                class="progress-card"
-                                data-processing-job
-                                data-status-url="{% url 'media_library:media_processing_job_status' job.pk %}"
-                            >
-                                <div class="progress-top">
-                                    <span data-processing-stage>{% translate "Processing" %}: {{ job.get_stage_display }}</span>
-                                    <span data-processing-percent>{{ job.progress }}%</span>
+                {% if request.user.is_staff %}
+                    {% with job=active_variant.processing_jobs.first %}
+                        {% if job %}
+                            {% if job.status == "pending" or job.status == "running" %}
+                                <div
+                                    class="progress-card"
+                                    data-processing-job
+                                    data-status-url="{% url 'media_library:media_processing_job_status' job.pk %}"
+                                >
+                                    <div class="progress-top">
+                                        <span data-processing-stage>{% translate "Processing" %}: {{ job.get_stage_display }}</span>
+                                        <span data-processing-percent>{{ job.progress }}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div data-processing-fill class="progress-fill" style="width: {{ job.progress }}%;"></div>
+                                    </div>
+                                    {% if job.error %}
+                                        <div data-processing-message class="meta">{{ job.error|truncatechars:180 }}</div>
+                                    {% elif job.message %}
+                                        <div data-processing-message class="meta">{{ job.message }}</div>
+                                    {% else %}
+                                        <div data-processing-message class="meta"></div>
+                                    {% endif %}
                                 </div>
-                                <div class="progress-bar">
-                                    <div data-processing-fill class="progress-fill" style="width: {{ job.progress }}%;"></div>
-                                </div>
-                                {% if job.error %}
-                                    <div data-processing-message class="meta">{{ job.error|truncatechars:180 }}</div>
-                                {% elif job.message %}
-                                    <div data-processing-message class="meta">{{ job.message }}</div>
-                                {% else %}
-                                    <div data-processing-message class="meta"></div>
-                                {% endif %}
-                            </div>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                {% endwith %}
+                    {% endwith %}
+                {% endif %}
 
                 <div class="media-preview">
                     <div class="section-header">
@@ -350,36 +375,6 @@
                             {% if episode.duration_minutes %}{{ episode.duration_minutes }} {% translate "min" %}{% endif %}
                             {% if episode.variants.count %} • {% blocktranslate count count=episode.variants.count %}{{ count }} file{% plural %}{{ count }} files{% endblocktranslate %}{% endif %}
                         </div>
-                        {% for variant in episode.variants.all %}
-                            {% with job=variant.processing_jobs.first %}
-                                {% if job %}
-                                    {% if job.status == "done" %}
-                                    {% else %}
-                                        <div
-                                            class="progress-card"
-                                            data-processing-job
-                                            data-status-url="{% url 'media_library:media_processing_job_status' job.pk %}"
-                                            style="margin-top: 8px;"
-                                        >
-                                            <div class="progress-top">
-                                                <span data-processing-stage>{% translate "Processing" %}: {{ job.get_stage_display }}</span>
-                                                <span data-processing-percent>{{ job.progress }}%</span>
-                                            </div>
-                                            <div class="progress-bar">
-                                                <div data-processing-fill class="progress-fill" style="width: {{ job.progress }}%;"></div>
-                                            </div>
-                                            {% if job.error %}
-                                                <div data-processing-message class="meta">{{ job.error|truncatechars:180 }}</div>
-                                            {% elif job.message %}
-                                                <div data-processing-message class="meta">{{ job.message }}</div>
-                                            {% else %}
-                                                <div data-processing-message class="meta"></div>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
-                            {% endwith %}
-                        {% endfor %}
                         {% if episode.description %}
                             <div class="media-description">{{ episode.description }}</div>
                         {% endif %}

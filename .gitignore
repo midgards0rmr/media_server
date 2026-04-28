@@ -1,5 +1,8 @@
 .venv
 .vscode
 .env
+.codex
 media/
 tmp_uploads/
+**/__pycache__/
+**/migrations/

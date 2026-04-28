@@ -408,7 +408,17 @@ class SeasonDetailView(DetailView):
         active_variant = None
         if active_episode is not None:
             variants = list(active_episode.variants.all())
-            active_variant = variants[0] if variants else None
+            active_variant = next(
+                (
+                    variant
+                    for variant in variants
+                    if variant.hls_manifest
+                    or variant.subtitle_tracks
+                    or variant.audio_tracks
+                    or variant.playable_file
+                ),
+                variants[0] if variants else None,
+            )
 
         context["active_episode"] = active_episode
         context["active_variant"] = active_variant
