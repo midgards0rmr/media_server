@@ -5,4 +5,3 @@
 media/
 tmp_uploads/
 **/__pycache__/
-**/migrations/
