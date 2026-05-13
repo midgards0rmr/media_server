@@ -37,8 +37,8 @@
                     <div class="checkbox-list">
                         {% for genre in available_genres %}
                             <label class="checkbox-item">
-                                <input type="checkbox" name="genres" value="{{ genre }}"{% if genre in selected_genres %} checked{% endif %}>
-                                <span>{{ genre }}</span>
+                                <input type="checkbox" name="genres" value="{{ genre.name }}"{% if genre.name in selected_genres %} checked{% endif %}>
+                                <span>{{ genre.name }}</span>
                             </label>
                         {% empty %}
                             <div class="meta">{% translate "Genres are not filled in yet." %}</div>
@@ -90,8 +90,8 @@
                                 {% if media_file.variants.count %}
                                     <span class="tag">{% blocktranslate count count=media_file.variants.count %}{{ count }} file{% plural %}{{ count }} files{% endblocktranslate %}</span>
                                 {% endif %}
-                                {% for genre in media_file.genres %}
-                                    <span class="tag">{{ genre }}</span>
+                                {% for genre in media_file.genres.all %}
+                                    <span class="tag">{{ genre.name }}</span>
                                 {% endfor %}
                             </div>
 

@@ -11,9 +11,11 @@ from media_library.ffmpeg import (
 
 from media_library.models import (
     Episode,
+    Genre,
     MediaImage,
     MediaProcessingJob,
     MediaTitle,
+    MediaTitleGenre,
     MediaVariant,
     Season,
 )
@@ -40,6 +42,18 @@ class EpisodeInline(admin.TabularInline):
     ordering = ("episode_number",)
 
 
+class MediaTitleGenreInline(admin.TabularInline):
+    model = MediaTitleGenre
+    extra = 0
+    autocomplete_fields = ("genre",)
+
+
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+    ordering = ("name",)
+
+
 @admin.register(MediaTitle)
 class MediaTitleAdmin(admin.ModelAdmin):
     list_display = (
@@ -49,11 +63,11 @@ class MediaTitleAdmin(admin.ModelAdmin):
         "release_year",
         "updated_at",
     )
-    list_filter = ("media_type", "status", "release_year")
+    list_filter = ("media_type", "status", "release_year", "genres")
     search_fields = ("title", "original_title", "slug")
     readonly_fields = ("slug", "created_at", "updated_at")
     ordering = ("title",)
-    inlines = (MediaImageInline, SeasonInline)
+    inlines = (MediaTitleGenreInline, MediaImageInline, SeasonInline)
     fieldsets = (
         (
             None,
@@ -75,7 +89,6 @@ class MediaTitleAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "release_year",
-                    "genres",
                     "countries",
                     "language",
                     "age_rating",

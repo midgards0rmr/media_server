@@ -25,6 +25,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from media_library.forms import EpisodeForm, MediaTitleForm, MediaVariantForm, SeasonForm
 from media_library.models import (
     Episode,
+    Genre,
     MediaImage,
     MediaProcessingJob,
     MediaTitle,
@@ -261,6 +262,7 @@ class MediaFileListView(ListView):
             super()
             .get_queryset()
             .prefetch_related(
+                "genres",
                 "images",
                 "variants",
                 Prefetch("seasons", queryset=Season.objects.prefetch_related("episodes")),
@@ -268,15 +270,11 @@ class MediaFileListView(ListView):
         )
 
     def _available_genres(self):
-        genres = set()
-        for genre_list in self._base_queryset().values_list("genres", flat=True):
-            if isinstance(genre_list, list):
-                genres.update(
-                    genre.strip()
-                    for genre in genre_list
-                    if isinstance(genre, str) and genre.strip()
-                )
-        return sorted(genres, key=str.lower)
+        return (
+            Genre.objects.filter(media_titles__isnull=False)
+            .distinct()
+            .order_by("name")
+        )
 
     def _available_years(self):
         years = self._base_queryset().exclude(release_year__isnull=True).values_list(
@@ -311,7 +309,7 @@ class MediaFileListView(ListView):
             queryset = queryset.filter(release_year=year)
 
         for genre in selected_genres:
-            queryset = queryset.filter(genres__contains=[genre])
+            queryset = queryset.filter(genres__name=genre)
 
         return queryset
 
@@ -340,6 +338,7 @@ class MediaFileDetailView(DetailView):
             super()
             .get_queryset()
             .prefetch_related(
+                "genres",
                 "images",
                 Prefetch(
                     "variants",

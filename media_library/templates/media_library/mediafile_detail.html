@@ -160,10 +160,12 @@
                         <div>{{ media_file.age_rating }}</div>
                     </div>
                 {% endif %}
-                {% if media_file.genres %}
+                {% if media_file.genres.exists %}
                     <div class="data-row">
                         <div class="data-label">{% translate "Genres" %}</div>
-                        <div>{{ media_file.genres|join:", " }}</div>
+                        <div>
+                            {% for genre in media_file.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        </div>
                     </div>
                 {% endif %}
                 {% if media_file.countries %}

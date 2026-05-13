@@ -112,6 +112,18 @@ def media_image_upload_to(instance: "MediaImage", filename: str) -> str:
     return f"{MEDIA_LIBRARY_DIR}/{title_slug}/images/{image_kind}/{file_name}"
 
 
+class Genre(models.Model):
+    name = models.CharField(_("Name"), max_length=100, unique=True)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = _("Genre")
+        verbose_name_plural = _("Genres")
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class MediaTitle(models.Model):
     class MediaType(models.TextChoices):
         MOVIE = "movie", _("Movie")
@@ -159,7 +171,13 @@ class MediaTitle(models.Model):
         null=True,
         validators=[MinValueValidator(1888), MaxValueValidator(2100)],
     )
-    genres = models.JSONField(_("Genres"), default=list, blank=True)
+    genres = models.ManyToManyField(
+        Genre,
+        through="MediaTitleGenre",
+        related_name="media_titles",
+        verbose_name=_("Genres"),
+        blank=True,
+    )
     countries = models.JSONField(_("Countries"), default=list, blank=True)
     language = models.CharField(_("Language"), max_length=64, blank=True)
     age_rating = models.CharField(_("Age rating"), max_length=16, blank=True)
@@ -224,6 +242,40 @@ class MediaTitle(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
+
+
+class MediaTitleGenre(models.Model):
+    media_title = models.ForeignKey(
+        MediaTitle,
+        on_delete=models.CASCADE,
+        related_name="genre_links",
+        verbose_name=_("Media title"),
+    )
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        related_name="media_title_links",
+        verbose_name=_("Genre"),
+    )
+    created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
+
+    class Meta:
+        ordering = ("media_title", "genre__name")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["media_title", "genre"],
+                name="unique_media_title_genre",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["media_title", "genre"]),
+            models.Index(fields=["genre", "media_title"]),
+        ]
+        verbose_name = _("Media title genre")
+        verbose_name_plural = _("Media title genres")
+
+    def __str__(self) -> str:
+        return f"{self.media_title} - {self.genre}"
 
 
 class Season(models.Model):

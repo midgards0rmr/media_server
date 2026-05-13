@@ -1,13 +1,79 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import gettext_lazy as _
 
-from media_library.models import Episode, MediaTitle, MediaVariant, Season
+from media_library.models import Episode, Genre, MediaTitle, MediaVariant, Season
 
 
 class MediaTitleForm(forms.ModelForm):
+    genres = forms.CharField(
+        label=_("Genres"),
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3}),
+        help_text=_("Enter a JSON array or one genre per line."),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["genres"].initial = "\n".join(
+                self.instance.genres.order_by("name").values_list("name", flat=True)
+            )
+
+    def clean_genres(self):
+        value = self.cleaned_data.get("genres", "")
+        if not value:
+            return []
+
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            parsed = value.replace(",", "\n").splitlines()
+
+        if not isinstance(parsed, list):
+            raise ValidationError(_("Genres must be a list."))
+
+        genres = []
+        seen = set()
+        for item in parsed:
+            if not isinstance(item, str):
+                raise ValidationError(_("Each genre must be text."))
+            genre = item.strip()
+            key = genre.casefold()
+            if genre and key not in seen:
+                seen.add(key)
+                genres.append(genre)
+
+        return genres
+
+    def _get_or_create_genre(self, name):
+        genre = Genre.objects.filter(name__iexact=name).first()
+        if genre:
+            return genre
+        return Genre.objects.create(name=name)
+
+    def save(self, commit=True):
+        genre_names = self.cleaned_data.pop("genres", [])
+        instance = super().save(commit=commit)
+        if commit:
+            genre_objects = [self._get_or_create_genre(name) for name in genre_names]
+            instance.genres.set(genre_objects)
+        else:
+            self._pending_genre_names = genre_names
+        return instance
+
+    def save_m2m(self):
+        super().save_m2m()
+        if hasattr(self, "_pending_genre_names"):
+            genre_objects = [
+                self._get_or_create_genre(name) for name in self._pending_genre_names
+            ]
+            self.instance.genres.set(genre_objects)
+
     class Meta:
         model = MediaTitle
         fields = [
@@ -28,7 +94,6 @@ class MediaTitleForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 4}),
             "title_localizations": forms.Textarea(attrs={"rows": 4}),
             "description_localizations": forms.Textarea(attrs={"rows": 4}),
-            "genres": forms.Textarea(attrs={"rows": 3}),
             "countries": forms.Textarea(attrs={"rows": 3}),
         }
 
