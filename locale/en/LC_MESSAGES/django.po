@@ -339,6 +339,9 @@ msgstr "Log out"
 msgid "Log in"
 msgstr "Log in"
 
+msgid "Username"
+msgstr "Username"
+
 msgid "Register"
 msgstr "Register"
 

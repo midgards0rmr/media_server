@@ -345,6 +345,9 @@ msgstr "Выйти"
 msgid "Log in"
 msgstr "Войти"
 
+msgid "Username"
+msgstr "Логин"
+
 msgid "Register"
 msgstr "Регистрация"
 
