@@ -238,6 +238,11 @@
             align-items: start;
         }
 
+        .list-layout > .section + .section,
+        .detail-layout > .section + .section {
+            margin-top: 0;
+        }
+
         .catalog-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
